@@ -64,12 +64,16 @@ pub fn main() !void {
         }
     }
 
+    const outw = std.io.getStdOut().writer();
+
     if (events.items.len > 0) {
         const event = events.items[0];
         const tu = try event.timeUntilEvent(alloc, &localTz);
         defer alloc.free(tu);
 
-        const outw = std.io.getStdOut().writer();
         try outw.print("{s}: {s}\n", .{ event.title, tu });
+        return;
     }
+
+    try outw.print("No meetings\n", .{});
 }
