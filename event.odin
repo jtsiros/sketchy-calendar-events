@@ -27,8 +27,8 @@ display_event :: proc(event: Event) {
 	if !ok {
 		return
 	}
-	dt_local, ok_to_tz := timezone.datetime_to_tz(dt, tz)
 
+	dt_local, ok_to_tz := timezone.datetime_to_tz(dt, tz)
 	if !ok_to_tz {
 		return
 	}
