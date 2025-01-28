@@ -53,6 +53,13 @@ main :: proc() {
 		fmt.eprintf("could not parse events: %v\n", events_err)
 		os.exit(1)
 	}
+
+	if len(events) == 0 {
+		fmt.println("No meetings")
+		os.exit(0)
+	}
+
+
 	defer delete(events)
 	display_event(events[0])
 }
