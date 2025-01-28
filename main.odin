@@ -6,6 +6,8 @@ import "core:os/os2"
 
 main :: proc() {
 
+	debug_tracker_setup()
+
 	args := []string {
 		"/opt/homebrew/bin/iCalBuddy",
 		"-ea",
@@ -52,8 +54,5 @@ main :: proc() {
 		os.exit(1)
 	}
 	defer delete(events)
-
-	for event in events {
-		fmt.printf("%v\n", event)
-	}
+	display_event(events[0])
 }
