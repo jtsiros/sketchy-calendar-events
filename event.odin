@@ -33,9 +33,9 @@ display_event :: proc(event: Event) {
 		return
 	}
 
-	now_total := (u16(dt_local.hour) * 60) + u16(dt_local.minute)
-	event_total := (u16(event.dt.hour) * 60) + u16(event.dt.minute)
-	diff_minutes := event_total - now_total
+	now_total := u16(dt_local.hour) * 60 + u16(dt_local.minute)
+	event_total := u16(event.dt.hour) * 60 + u16(event.dt.minute)
+	diff_minutes := i16(event_total - now_total)
 
 	if diff_minutes < 0 {
 		diff_minutes = 0
