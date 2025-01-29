@@ -54,12 +54,12 @@ pub fn main() !void {
     var events = ArrayList(Event).init(alloc);
     defer events.deinit();
 
-    const localTz = try zeit.local(alloc, &env);
-    defer localTz.deinit();
+    const local_tz = try zeit.local(alloc, &env);
+    defer local_tz.deinit();
 
     var it = std.mem.splitSequence(u8, stdout.items, "\n");
-    while (it.next()) |rawEvent| {
-        if (try Event.from(&localTz, rawEvent) orelse null) |event| {
+    while (it.next()) |raw_event| {
+        if (try Event.from(&local_tz, raw_event) orelse null) |event| {
             try events.append(event);
         }
     }
@@ -68,7 +68,7 @@ pub fn main() !void {
 
     if (events.items.len > 0) {
         const event = events.items[0];
-        const tu = try event.timeUntilEvent(alloc, &localTz);
+        const tu = try event.timeUntilEvent(alloc, &local_tz);
         defer alloc.free(tu);
 
         try outw.print("{s}: {s}\n", .{ event.title, tu });

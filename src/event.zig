@@ -2,7 +2,10 @@ const std = @import("std");
 const zeit = @import("zeit");
 const ArrayList = std.ArrayList;
 
-const parseError = error{InvalidFormat};
+const parseError = error{
+    InvalidFormat,
+    InvalidTimeFormat,
+};
 
 title: []const u8,
 datetime: zeit.Instant,
@@ -23,7 +26,7 @@ pub fn from(local: *const zeit.TimeZone, raw: []const u8) !?Event {
         .source = .{ .iso8601 = raw_datetime },
     }) catch |err| {
         std.debug.print("error parsing time: {!}\n", .{err});
-        return error.InvalidFormat;
+        return error.InalidTimeFormat;
     };
 
     const event = Event{
@@ -34,44 +37,41 @@ pub fn from(local: *const zeit.TimeZone, raw: []const u8) !?Event {
     return event;
 }
 
-pub fn timeUntilEvent(
-    self: *const Event,
-    alloc: std.mem.Allocator,
-    local: *const zeit.timezone.TimeZone,
-) ![]const u8 {
+pub fn timeUntilEvent(self: *const Event, alloc: std.mem.Allocator, local: *const zeit.timezone.TimeZone) ![]const u8 {
+
     const now_gmt = try zeit.instant(.{});
     const now_local = now_gmt.in(local);
     const now = now_local.time();
 
-    const eventTime = self.datetime.time();
+    const event_time = self.datetime.time();
 
-    const nowTotal = now.hour * @as(i16, 60) + now.minute;
-    const otherTotal = eventTime.hour * @as(i16, 60) + eventTime.minute;
-    var diffMinutes = otherTotal - nowTotal;
+    const now_total = now.hour * @as(i16, 60) + now.minute;
+    const other_total = event_time.hour * @as(i16, 60) + event_time.minute;
+    var diff_minutes = other_total - now_total;
 
-    if (diffMinutes < 0) {
-        diffMinutes = 0;
+    if (diff_minutes < 0) {
+        diff_minutes = 0;
     }
 
-    const hours = @divFloor(diffMinutes, 60);
-    const minutes = @mod(diffMinutes, 60);
-    var printedAny = false;
+    const hours = @divFloor(diff_minutes, 60);
+    const minutes = @mod(diff_minutes, 60);
+    var printed_any = false;
 
     var buffer = ArrayList(u8).init(alloc);
     const writer = buffer.writer();
 
     if (hours != 0) {
         try writer.print("{}h", .{hours});
-        printedAny = true;
+        printed_any = true;
     }
 
     if (minutes != 0) {
-        if (printedAny) try writer.print(" ", .{});
+        if (printed_any) try writer.print(" ", .{});
         try writer.print("{}m", .{minutes});
-        printedAny = true;
+        printed_any = true;
     }
 
-    if (!printedAny) {
+    if (!printed_any) {
         try writer.print("now", .{});
     }
 
